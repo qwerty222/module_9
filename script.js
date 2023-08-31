@@ -3,29 +3,34 @@ const gallery = document.querySelector(".main__gallery");
 
 const getNewPicture = async () => {
     try {
-        //showLoader();
+        showLoader();
+
+        const response = await fetch("https://api.thecatapi.com/v1/images/search");
         
-        const num = Math.floor(Math.random() * 29);
-        const response = await fetch("https://dog.ceo/api/breeds/image/random/29");
+        if (!response.ok) {
+            throw new Error(`Что-то пошло не так! :( status: ${response.status}`);
+        }
+
         const data = await response.json();
-        const url = data.message[num];
-        const pic = `
-            <div class="main__gallery-item">
-                <img src="${url}">
-            </div>
-        `;
-        gallery.insertAdjacentHTML("beforeend", pic);
-    } catch (err) {
-        console.log(err);
+
+        const newDiv = document.createElement("div");
+        newDiv.classList.add("main__gallery-item");
+        const newImg = document.createElement("img");
+        newImg.src = data[0].url;
+        newImg.alt = "фото кота";
+        newDiv.appendChild(newImg);
+        gallery.appendChild(newDiv);
+    } catch (error) {
+        console.error("Error: ", error);
     } finally {
-        //hideLoader();
+        hideLoader();
     }
 };
 
 btn.addEventListener("click", getNewPicture);
 
 function showLoader() {
-    document.getElementById("loader").style.display = "flex";
+    document.getElementById("loader").style.display = "block";
 }
   
 function hideLoader() {
